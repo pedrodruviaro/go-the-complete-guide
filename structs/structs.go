@@ -1,61 +1,44 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"time"
+
+	"example.com/structs/user"
 )
 
-type user struct {
-	firstName string
-	lastName string
-	birthdate string
-	createdAt time.Time
-}
-
-func (user user) outputUserDetail() {
-	fmt.Println(user.firstName, user.lastName, user.birthdate)
-}
-
-func (user *user) clearUserName() {
-	user.firstName = ""
-	user.lastName = ""
-}
-
-func newUser(firstName, lastName, birthdate string) (*user, error) {
-	if firstName == "" || lastName == ""  || birthdate == "" {
-		return nil, errors.New("invalid body")
-	}
-
-	return &user{
-		firstName: firstName,
-		lastName: lastName,
-		birthdate: birthdate,
-		createdAt: time.Now(),
-	}, nil
-}
 
 func main() {
 	firstName := getUserData("Please enter your first name: ")
 	lastName := getUserData("Please enter your last name: ")
 	birthdate := getUserData("Please enter your birthdate (MM/DD/YYYY): ")
 
-	appUser, err := newUser(
+	var appUser *user.User // crio uma variável que irá (atualmente é `nil`) guardar um endereço de memória
+
+	appUser, err := user.New(
 		firstName,
 		lastName,
 		birthdate,
-	)
+	) // atribui o endereço de memória retornado pela função
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(appUser)
+	appUser.OutputUserDetail()
+	appUser.ClearUserName()
+	appUser.OutputUserDetail()
 
-	appUser.outputUserDetail()
-	appUser.clearUserName()
-	appUser.outputUserDetail()
+	var admin *user.Admin
+
+	admin, adminError := user.NewAdmin("pedrodruviaro@gmail.com", "123456")
+
+	if adminError != nil {
+		fmt.Println(adminError)
+		return
+	}
+
+	admin.OutputUserDetail()
 }
 
 func getUserData(promptText string) string {
